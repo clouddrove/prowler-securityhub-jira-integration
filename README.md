@@ -93,6 +93,8 @@ step: 5 In search bar, search for “Prowler“. and then click on “accept fin
 ```bash
  cd terraform
 ```
+- Add variables in Variables.tf file or create .tfvars file.
+
 - Initialize Terraform:
 
 ```hcl
