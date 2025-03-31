@@ -1,0 +1,39 @@
+name: Prowler Scan for Multiple Account
+on:
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::9887617XXXXX:role/github-oidc-role
+          role-session-name: github-actions
+          aws-region: us-east-1
+
+      - name: Installing Prowler Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt install zip unzip python3-pip -y
+          sudo apt remove python3-urllib3 -y
+          sudo pip install --ignore-installed prowler matplotlib pandas numpy requests slack-sdk plotly
+          prowler --version
+          ulimit -n 4096
+
+      - name: Run Prowler Scan for Multiple Accounts
+        run: |
+          for ACCOUNT in "2887617XXXXX" "0540371XXXXX" "5970880XXXXX" "9750499XXXXX"; do
+            echo ":pushpin: Running Prowler scan for Account: $ACCOUNT"
+            prowler aws \
+              --role arn:aws:iam::$ACCOUNT:role/prowler-security-hub \
+              --output-formats json-asff \
+              --security-hub \
+              --ignore-exit-code-3
+            echo ":white_check_mark: Scan completed for Account: $ACCOUNT and findings sent to Security Hub!"
+          done
