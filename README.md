@@ -10,73 +10,79 @@ Automates sending Prowler findings to AWS SecurityHub and Jira for streamlined s
 * ***Terraform:*** For automating Lambda deployment.
 * Before running the Lambda function, ensure you have security hub and Prowler enable:
 - AWS Security Hub: Configured and enabled in the regions you are monitoring.
-- Follow below steps for single account setup:
+#### Follow below steps for single account setup:
 
-    step 1: open aws security hub from console.
+step 1: open aws security hub from console.
 
-    step 2: Click on “Go to Security Hub”.
+step 2: Click on “Go to Security Hub”.
 
-    ![Alt text](images/pro-1.png)
+![Alt text](images/pro-1.png)
+Step 3: Then enter Delegated Administrator AWS account ID and click on enable Security Hub.
 
-    Step 3: Then enter Delegated Administrator AWS account ID and click on enable Security Hub.
+![Alt text](images/pro-2.png)
 
-    ![Alt text](images/pro-2.png)
+step 4: Then click on integrations from left panel.
 
-    step 4: Then click on integrations from left panel.
+![Alt text](images/pro-3.png)
 
-    ![Alt text](images/pro-3.png)
+step: 5 In search bar, search for “Prowler“. and then click on “accept findings“.
 
-    step: 5 In search bar, search for “Prowler“. and then click on “accept findings“.
+![Alt text](images/pro-4.png)
 
-    ![Alt text](images/pro-4.png)
+#### For Multiple account setup, follow below steps using workflow:
 
-- For Multiple account setup, follow below steps using workflow:
+* checkout code for workflow at `.github/workflows/multi-account-setup.yaml`
+* About Code: 
 
-1. Check out code
+    1. Check out code
 
-    * Uses actions/checkout@v4 to clone the repository code to the runner
+        * Uses actions/checkout@v4 to clone the repository code to the runner
 
-2. Configure AWS credentials with OIDC
+    2. Configure AWS credentials with OIDC
 
-    * Uses AWS's credential action to authenticate via OpenID Connect
+        * Uses AWS's credential action to authenticate via OpenID Connect
 
-        a. add arn of root account .
+            a. add arn of root account .
 
-    * Assumes a specific IAM role with session name "github-actions"
+        * Assumes a specific IAM role with session name "github-actions"
 
-    * Sets default AWS region to us-east-1, change as per your need.
+        * Sets default AWS region to us-east-1, change as per your need.
 
-3. Installing Prowler Dependencies
+    3. Installing Prowler Dependencies
 
-    * Updates apt packages
+        * Updates apt packages
 
-    * Installs zip, unzip, and python3-pip
+        * Installs zip, unzip, and python3-pip
 
-    * Removes python3-urllib3 (likely to avoid version conflicts)
+        * Removes python3-urllib3 (likely to avoid version conflicts)
 
-    * Installs Prowler and various Python libraries
+        * Installs Prowler and various Python libraries
 
-    * Verifies Prowler installation
+        * Verifies Prowler installation
 
-    * Increases file handle limit for the scan
+        * Increases file handle limit for the scan
 
-4. Run Prowler Scan for Multiple Accounts
+    4. Run Prowler Scan for Multiple Accounts
 
-    * Loops through four AWS account IDs
 
-    * For each account:
+        * Loops through four AWS account IDs
 
-        a. Assumes a role called "prowler-security-hub", assume role must be in security account where you want to send all accounts findings.
+            * add account IDs of all account you want to setup for.
 
-        b. Runs Prowler with JSON-ASFF output format
 
-        c. Sends findings directly to AWS Security Hub 
+        * For each account:
 
-         -  mention all account ids in loop.
+            a. Assumes a role called "prowler-security-hub", assume role must be in security account where you want to send all accounts findings.
 
-        d. Ignores exit code 3 (likely non-critical errors/warnings)
+            b. Runs Prowler with JSON-ASFF output format
 
-        e. Logs completion message
+            c. Sends findings directly to AWS Security Hub 
+
+                -  mention all account ids in loop.
+
+            d. Ignores exit code 3 (likely non-critical errors/warnings)
+
+            e. Logs completion message
 
 - Run the workflow by trigger it manually (workflow_dispatch).
 
