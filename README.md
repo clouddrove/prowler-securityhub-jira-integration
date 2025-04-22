@@ -96,9 +96,37 @@ Go to your repository (or organization) **Settings → Secrets and variables →
 
 ##### 3. Configure the Workflow
 
-Create a workflow file (e.g., `.github/workflows/prowler.yml`)
-For reference, see [example_prowler_workflow ](./.github/workflows/prowler.yaml) in this repository.
+- Create a workflow file at this path `.github/workflows/` in your github repository.
+e.g., `.github/workflows/prowler.yml`
 
+- paste the below code in you github workflow file.
+
+```yaml
+name: Prowler Setup
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prowler-setup:
+    uses: clouddrove/github-shared-workflows/.github/workflows/prowlerAWS.yml@master
+    with:
+      cloud_provider: aws
+      aws_region: us-east-1 # Change as needed
+      enable_s3_upload: false # Set true if you want to upload to S3
+      enable_slack_notification: false # Set true if you want Slack notifications
+      send_to_securityhub: true
+      # Optionally set other inputs as needed
+    secrets:
+      BUILD_ROLE: arn:aws:iam::<YOUR_CENTRAL_ACCOUNT_ID>:role/<OIDC_ROLE_NAME>
+      PROWLER_ROLE_NAME: <PROWLER_ROLE_NAME>
+      TARGET_ACCOUNT_ID: "<ACCOUNT_ID_1> <ACCOUNT_ID_2> <ACCOUNT_ID_3>"
+      # Optional: S3_BUCKET_NAME, SLACK_WEBHOOK, SLACK_USERNAME if needed
+```
+- Add values for variables.
+- Run workflow manually (Workflow dispatch).
+- For more information about Prowler workflow you can checkout this : [ProwlerAWS workflow](https://github.com/clouddrove/github-shared-workflows/blob/master/docs/prowlerAWS.md)
+- ***Note*** : If you want to setup for single account mention that account id only in `TARGET_ACCOUNT_ID`.
 
 ### Terraform Code Deployment: 
 
