@@ -10,7 +10,7 @@ Automates sending Prowler findings to AWS SecurityHub and Jira for streamlined s
 * ***Terraform:*** For automating Lambda deployment.
 * Before running the Lambda function, ensure you have security hub and Prowler enable:
 - AWS Security Hub: Configured and enabled in the regions you are monitoring.
-#### Follow below steps for single account setup:
+<!-- #### Follow below steps for single account setup manually:
 
 step 1: open aws security hub from console.
 
@@ -84,7 +84,96 @@ step: 5 In search bar, search for “Prowler“. and then click on “accept fin
 
             e. Logs completion message
 
-- Run the workflow by trigger it manually (workflow_dispatch).
+- Run the workflow by trigger it manually (workflow_dispatch). -->
+
+### Prowler AWS Security Scanning Workflow:
+
+#### Features
+
+- 🔒 **Single and Multi-account scanning** using a single workflow run
+- 🔄 **OIDC authentication** for secure, short-lived access
+- 🚨 **Findings sent to AWS Security Hub**
+- ☁️ Optional **S3 upload** for report retention
+- 💬 Optional **Slack notifications** for scan results
+- 📦 **Reusable workflow** for easy integration and maintenance
+
+---
+
+#### Setup
+
+##### 1. Prerequisites
+
+- AWS accounts with an IAM role for Prowler scanning (`PROWLER_ROLE_NAME`) with below policy.
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ProwlerReadOnlyAccess",
+            "Effect": "Allow",
+            "Action": [
+                "access-analyzer:List*",
+                "apigateway:GET",
+                "cloudformation:Describe*",
+                "cloudfront:Get*",
+                "cloudtrail:Describe*",
+                "cloudtrail:Get*",
+                "cloudwatch:Describe*",
+                "cloudwatch:Get*",
+                "config:Describe*",
+                "config:Get*",
+                "ec2:Describe*",
+                "eks:Describe*",
+                "elasticache:Describe*",
+                "elasticloadbalancing:Describe*",
+                "guardduty:Get*",
+                "iam:GenerateCredentialReport",
+                "iam:Get*",
+                "iam:List*",
+                "inspector2:List*",
+                "kms:List*",
+                "rds:Describe*",
+                "redshift:Describe*",
+                "s3:GetBucketLocation",
+                "s3:GetBucketPolicyStatus",
+                "s3:GetBucketPublicAccessBlock",
+                "s3:ListAllMyBuckets",
+                "secretsmanager:ListSecrets",
+                "securityhub:BatchImportFindings",
+                "securityhub:Get*",
+                "ssm:Describe*",
+                "sts:GetCallerIdentity"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+- A central AWS account with an OIDC role for GitHub Actions (`BUILD_ROLE`)
+- GitHub repository with access to store secrets.
+
+##### 2. Configure Secrets
+
+Go to your repository (or organization) **Settings → Secrets and variables → Actions** and add the following secrets:
+
+| Secret Name           | Description                                   |
+|-----------------------|-----------------------------------------------|
+| `BUILD_ROLE`          | OIDC role ARN in your central AWS account     |
+| `PROWLER_ROLE_NAME`   | Name of the IAM role to assume in each target |
+| `AWS_ACCESS_KEY_ID`   | (Optional) AWS access key for fallback        |
+| `AWS_SECRET_ACCESS_KEY` | (Optional) AWS secret key for fallback      |
+| `AWS_SESSION_TOKEN`   | (Optional) AWS session token for fallback     |
+| `TARGET_ACCOUNT_ID`   | Space-separated list of AWS account IDs       |
+| `S3_BUCKET_NAME`      | (Optional) S3 bucket for report uploads       |
+| `SLACK_WEBHOOK`       | (Optional) Slack webhook URL                  |
+| `SLACK_USERNAME`      | (Optional) Slack username                     |
+- ***Note:*** Add secrets as per need.
+
+##### 3. Configure the Workflow
+
+Create a workflow file (e.g., `.github/workflows/prowler.yml`)
+For reference, see [example_prowler_workflow ](./.github/workflows/prowler.yaml) in this repository.
+
 
 ### Terraform Code Deployment: 
 

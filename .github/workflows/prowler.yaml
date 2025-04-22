@@ -1,0 +1,23 @@
+name: Prowler Setup
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prowler-setup:
+    uses: clouddrove/github-shared-workflows/.github/workflows/prowlerAWS.yml@master
+    with:
+      cloud_provider: aws
+      aws_region: us-east-1 # Change as needed
+      enable_s3_upload: false # Set true if you want to upload to S3
+      enable_slack_notification: false # Set true if you want Slack notifications
+      send_to_securityhub: true
+      # Optionally set other inputs as needed
+    secrets:
+      BUILD_ROLE: arn:aws:iam::<YOUR_CENTRAL_ACCOUNT_ID>:role/<OIDC_ROLE_NAME>
+      PROWLER_ROLE_NAME: <PROWLER_ROLE_NAME>
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+      TARGET_ACCOUNT_ID: "<ACCOUNT_ID_1> <ACCOUNT_ID_2> <ACCOUNT_ID_3>"
+      # Optional: S3_BUCKET_NAME, SLACK_WEBHOOK, SLACK_USERNAME if needed
