@@ -12,7 +12,7 @@ Automates sending Prowler findings to AWS SecurityHub and Jira for streamlined s
 - AWS Security Hub: Configured and enabled in the regions you are monitoring.
 
 ### Prowler AWS Security Scanning Workflow:
-Follow below steps to configure prowler and send findings to jira.
+Follow below steps to configure prowler and send findings to AWS security-hub.
 #### Features
 
 - 🔒 **Single and Multi-account scanning** using a single workflow run
